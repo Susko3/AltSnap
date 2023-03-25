@@ -3497,32 +3497,25 @@ static int ActionResize(POINT pt, const RECT *wnd, int button)
 /////////////////////////////////////////////////////////////////////////////
 static void ActionBorderless(HWND hwnd)
 {
-    LONG_PTR style=0;
-    // Get anc clear eventual old style.
-    LONG_PTR ostyle = ClearBorderlessFlag(hwnd);
-    if (ostyle) {
-        // Restore old style if found
-        style = ostyle;
-    } else {
-        style=GetWindowLongPtr(hwnd, GWL_STYLE);
-        if (!style) return;
-        SetBorderlessFlag(hwnd, style); // Save style
-        if((style&WS_CAPTION) == WS_CAPTION || style&WS_THICKFRAME) {
-            style &= state.shift? ~WS_CAPTION: ~(WS_CAPTION|WS_THICKFRAME);
-        } else {
-            style |= WS_OVERLAPPEDWINDOW;
-        }
-    }
-    SetWindowLongPtr(hwnd, GWL_STYLE, style);
+    int preference = DWMWCP_DEFAULT;
+    // Get anc clear eventual old preference.
+    DWM_WINDOW_CORNER_PREFERENCE previousPreference = ClearCornersFlag(hwnd);
 
-    // Under Windows 10, with DWM we HAVE to resize the windows twice
-    // to have proper drawing. this is a bug.
-    RECT rc;
-    GetWindowRect(hwnd, &rc);
-    SetWindowPos(hwnd, NULL, rc.left, rc.top, rc.right-rc.left, rc.bottom-rc.top+1
-               , SWP_ASYNCWINDOWPOS|SWP_NOMOVE|SWP_FRAMECHANGED|SWP_NOZORDER);
-    SetWindowPos(hwnd, NULL, rc.left, rc.top, rc.right-rc.left, rc.bottom-rc.top
-               , SWP_ASYNCWINDOWPOS|SWP_NOMOVE|SWP_NOZORDER);
+    if (previousPreference) {
+        // Restore old preference if found
+        preference = previousPreference == 4 ? DWMWCP_DEFAULT : previousPreference;
+    } else {
+        int cornerPreference = DWMWCP_DEFAULT;
+        DwmGetWindowAttributeL(hwnd, DWMWA_WINDOW_CORNER_PREFERENCE, &cornerPreference, sizeof(cornerPreference));
+
+        if (cornerPreference == DWMWCP_DEFAULT)
+            cornerPreference = 4;
+
+        SetCornersFlag(hwnd, cornerPreference); // Save prefs
+        preference = DWMWCP_DONOTROUND;
+    }
+    DwmSetWindowAttributeL(hwnd, DWMWA_WINDOW_CORNER_PREFERENCE, &preference, sizeof(preference));
+
 }
 /////////////////////////////////////////////////////////////////////////////
 #define CW_RESTORE (1<<0)

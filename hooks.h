@@ -39,6 +39,7 @@
 #define APP_MOVEONOFF  TEXT(APP_NAMEA"-MoveOnOff")
 #define FZ_PROPPT      TEXT("FancyZones_RestoreSize")
 #define FZ_PROPZONES   TEXT("FancyZones_zones")
+#define APP_CORNERS    TEXT(APP_NAMEA"-Corners")
 
 // User Messages
 #define WM_TRAY           (WM_USER+2)

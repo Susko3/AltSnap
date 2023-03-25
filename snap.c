@@ -202,6 +202,20 @@ static LONG_PTR ClearBorderlessFlag(HWND hwnd)
 {
     return (LONG_PTR)RemoveProp(hwnd, APP_PRBDLESS);
 }
+///////////////////////////////////////////////////////////////////////////////
+// Windows 11 rounded corners
+static void SetCornersFlag(HWND hwnd, DWM_WINDOW_CORNER_PREFERENCE flag)
+{
+    SetProp(hwnd, APP_CORNERS,(HANDLE)flag);
+}
+static DWM_WINDOW_CORNER_PREFERENCE GetCornersFlag(HWND hwnd)
+{
+    return (DWM_WINDOW_CORNER_PREFERENCE)GetProp(hwnd, APP_CORNERS);
+}
+static DWM_WINDOW_CORNER_PREFERENCE ClearCornersFlag(HWND hwnd)
+{
+    return (DWM_WINDOW_CORNER_PREFERENCE)RemoveProp(hwnd, APP_CORNERS);
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 //// Roll unroll stuff
